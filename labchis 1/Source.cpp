@@ -1,6 +1,8 @@
 #include<iostream>
 using std::cout;
 const int n = 3;
+double maxIndexF(int maxIndex, double an[]);
+double methodGauss(double matrix_A[], double matrix_b[], double c);
 void print(double a[][3], double b[], int n) {
 	cout << "\n";
 	for (int i = 0; i < n; i++) {
@@ -125,6 +127,7 @@ int main()
 		matrix_b[2] /= c;
 		matrix_A[2][2] /= c;
 	}
+	
 	//
 	print(matrix_A, matrix_b, n);
 	////обратный метод
@@ -171,50 +174,56 @@ int main()
 			maxIndex = i;
 		}
 	}
+	
 	cout << "\nNorm of Vector Of Discrepancy:\n d = " << matrix_F[maxIndex];
 	cout << "\nError:\n";
 	double error;
 	/// Calculating xn~~ Ax=Ax~
+	double methodGauss(double matrix_A[],double matrix_A_2[], double matrix_b[], double c, double matrix_Ax[]);
+	{
 
-	if (matrix_A_2[0][0] != 1) {
-		double c = matrix_A_2[0][0];
-		matrix_Ax[0] /= c;
+		if (matrix_A_2[0][0] != 1) {
+			double c = matrix_A_2[0][0];
+			matrix_Ax[0] /= c;
 
-		for (int j = 0; j < n; j++) {
-			matrix_A_2[0][j] /= c;
-		}
-	}
-	//2
-	for (int i = 1; i < n; i++) {
-		if (matrix_A_2[i][0] != 0) {
-			double c = matrix_A_2[i][0];
-			matrix_Ax[i] -= c * matrix_Ax[0];
 			for (int j = 0; j < n; j++) {
-				matrix_A_2[i][j] -= c * matrix_A_2[0][j];
+				matrix_A_2[0][j] /= c;
 			}
 		}
-	}
-	//3
-	if (matrix_A_2[1][1] != 1) {
-		double c = matrix_A_2[1][1];
-		matrix_Ax[1] /= c;
-		for (int j = 0; j < n; j++) {
-			matrix_A_2[1][j] /= c;
+
+		//2
+		for (int i = 1; i < n; i++) {
+			if (matrix_A_2[i][0] != 0) {
+				double c = matrix_A_2[i][0];
+				matrix_Ax[i] -= c * matrix_Ax[0];
+				for (int j = 0; j < n; j++) {
+					matrix_A_2[i][j] -= c * matrix_A_2[0][j];
+				}
+			}
 		}
-	}
-	//4
-	if (matrix_A_2[n - 1][1] != 0) {
-		double c = matrix_A_2[2][1];
-		matrix_Ax[2] -= c * matrix_Ax[1];
-		for (int j = 1; j < n; j++) {
-			matrix_A_2[2][j] -= c * matrix_A_2[1][j];
+		//3
+		if (matrix_A_2[1][1] != 1) {
+			double c = matrix_A_2[1][1];
+			matrix_Ax[1] /= c;
+			for (int j = 0; j < n; j++) {
+				matrix_A_2[1][j] /= c;
+			}
 		}
-	}
-	//5
-	if (matrix_A_2[2][2] != 1) {
-		double c = matrix_A_2[2][2];
-		matrix_Ax[2] /= c;
-		matrix_A_2[2][2] /= c;
+		//4
+		if (matrix_A_2[n - 1][1] != 0) {
+			double c = matrix_A_2[2][1];
+			matrix_Ax[2] -= c * matrix_Ax[1];
+			for (int j = 1; j < n; j++) {
+				matrix_A_2[2][j] -= c * matrix_A_2[1][j];
+			}
+		}
+		//5
+		if (matrix_A_2[2][2] != 1) {
+			double c = matrix_A_2[2][2];
+			matrix_Ax[2] /= c;
+			matrix_A_2[2][2] /= c;
+		}
+
 	}
 	////обратный метод
 	double xx[n];
@@ -227,16 +236,16 @@ int main()
 		xx[i] -= an[i];
 	}
 	//Find norm
+	double errorU = maxIndexF(maxIndex, xx);
+	double errorD = maxIndexF(maxIndex, an);
+	error = abs(errorU / errorD);
+	cout << "b = " << error;
+	return 0;
+}
+
+double maxIndexF(int maxIndex, double an[]) {
 	maxIndex = 0;
-	for (int i = 0; i < n; ++i)
-	{
-		if (fabs(xx[i]) > fabs(xx[maxIndex]))
-		{
-			maxIndex = i;
-		}
-	}
-	double errorU = xx[maxIndex];
-	maxIndex = 0;
+	double errorD;
 	for (int i = 0; i < n; ++i)
 	{
 		if (fabs(an[i]) > fabs(an[maxIndex]))
@@ -244,8 +253,7 @@ int main()
 			maxIndex = i;
 		}
 	}
-	double errorD = an[maxIndex];
-	error = abs(errorU / errorD);
-	cout << "b = " << error;
-	return 0;
+
+      errorD = an[maxIndex];
+	  return errorD;
 }
